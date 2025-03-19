@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Table</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: all 0.5s ease;
+            color: black; /* Set text color to black */
+        }
+
+        body.rainbow-active {
+            background: linear-gradient(
+                45deg,
+                rgba(255, 0, 0, var(--gradient-opacity)) 0%,
+                rgba(255, 154, 0, var(--gradient-opacity)) 10%,
+                rgba(208, 222, 33, var(--gradient-opacity)) 20%,
+                rgba(79, 220, 74, var(--gradient-opacity)) 30%,
+                rgba(63, 218, 216, var(--gradient-opacity)) 40%,
+                rgba(47, 201, 226, var(--gradient-opacity)) 50%,
+                rgba(28, 127, 238, var(--gradient-opacity)) 60%,
+                rgba(95, 21, 242, var(--gradient-opacity)) 70%,
+                rgba(186, 12, 248, var(--gradient-opacity)) 80%,
+                rgba(251, 7, 217, var(--gradient-opacity)) 90%,
+                rgba(255, 0, 0, var(--gradient-opacity)) 100%
+            );
+            background-size: 400% 400%;
+            animation: gradient 3s ease infinite, rainbow-move 5s linear infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes rainbow-move {
+            0% {
+                background-size: 100% 100%;
+                transform: scale(1);
+            }
+            50% {
+                background-size: 200% 200%;
+                transform: scale(1.1);
+            }
+            100% {
+                background-size: 100% 100%;
+                transform: scale(1);
+            }
+        }
+
+        .centered-image {
+            width: 15vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 60%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(0deg);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .beach-ball {
+            width: 45vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 2%;
+            top: 15%;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .handsaw {
+            width: 38vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 70%;
+            top: 10%;
+            transform: rotate(15deg);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nail-puller {
+            width: 32vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 8%;
+            top: 60%;
+            transform: rotate(-30deg);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ice-auger {
+            width: 32vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 70%;
+            top: 45%;
+            transform: rotate(15deg);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .water-gun {
+            width: 38vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 35%;
+            top: 1%;
+            transform: rotate(-15deg);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .swedbank-card {
+            width: 32vh;
+            height: auto;
+            mix-blend-mode: multiply;
+            opacity: 0.9;
+            position: absolute;
+            left: 35%;
+            top: 60%;
+            transform: rotate(20deg);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .rotating {
+            animation: rotate-normal 0.5s linear infinite;
+        }
+
+        .rotating.pulsing {
+    animation: rotate-normal 0.5s linear infinite, pulse 1s ease-in-out infinite;
+}
+
+        .centered-image.rotating {
+            animation: rotate-hammer 0.5s linear infinite;
+        }
+
+        .centered-image.rotating.pulsing {
+    animation: rotate-hammer 0.5s linear infinite, pulse 1s ease-in-out infinite;
+}
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.1);
+                filter: brightness(1.2);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes rotate-hammer {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        @keyframes rotate-normal {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* Add padding to ensure rotated images stay within bounds */
+        img {
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Add styles for the text */
+        .rainbow-text {
+            font-family: 'Futura', sans-serif; /* Ensure you have Futura available */
+            font-weight: bold;
+            font-size: 1rem; /* Adjusted size to make it smaller */
+            fill: black; /* Set the SVG text color to black */
+            animation: swirl 10s linear infinite; /* Adjust duration for speed */
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)); /* Glowing effect for SVG text */
+        }
+
+        @keyframes swirl {
+            0% {
+                offset-distance: 0%;
+            }
+            100% {
+                offset-distance: 100%;
+            }
+        }
+
+        .moving-gradient {
+            animation: gradient 3s ease infinite; /* Use the same gradient animation */
+        }
+
+        #play-button {
+            position: absolute;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            padding: 8px 16px; /* Adjusted padding for a smaller button */
+            font-size: 1rem; /* Adjusted font size to match other text */
+            cursor: pointer;
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners */
+            background: transparent; /* Make background transparent */
+            color: black; /* Set button text color to black */
+            font-family: 'Futura', sans-serif; /* Match font with other text */
+            transition: background 0.3s ease; /* Smooth transition for hover effect */
+            background-clip: text; /* Ensure background gradient is clipped to text */
+            -webkit-background-clip: text; /* For Safari */
+            background-image: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff); /* Rainbow gradient */
+            text-shadow: none; /* Remove any previous glowing effect */
+        }
+
+        #play-button:hover {
+            color: rgba(255, 255, 255, 0.8); /* Change text color on hover */
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.5); /* Glowing effect on hover */
+        }
+
+        #tropical-button {
+            position: relative; /* Ensure it aligns with the techno button */
+            padding: 8px 16px; /* Match padding */
+            font-size: 1rem; /* Match font size */
+            cursor: pointer;
+            border: none; /* Remove default border */
+            border-radius: 5px; /* Rounded corners */
+            background: transparent; /* Make background transparent */
+            color: black; /* Set button text color to black */
+            font-family: 'Futura', sans-serif; /* Match font with other text */
+            transition: background 0.3s ease; /* Smooth transition for hover effect */
+            background-clip: text; /* Ensure background gradient is clipped to text */
+            -webkit-background-clip: text; /* For Safari */
+            background-image: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff); /* Rainbow gradient */
+            margin-top: 20px; /* Increase space between buttons */
+            text-shadow: none; /* Remove any previous glowing effect */
+        }
+
+        #tropical-button:hover {
+            color: rgba(255, 255, 255, 0.8); /* Change text color on hover */
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.5); /* Glowing effect on hover */
+        }
+
+        /* Ensure all buttons and text elements inherit the black color */
+        button {
+            color: black; /* Set button text color to black */
+            text-shadow: none; /* Remove any previous glowing effect */
+            transition: color 0.3s ease; /* Smooth transition for hover effect */
+        }
+
+        button:hover {
+            color: rgba(255, 255, 255, 0.8); /* Change text color on hover */
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.5); /* Glowing effect on hover */
+        }
+    </style>
+</head>
+<body>
+    <img src="hammer.png" alt="Hammer" class="centered-image">
+    <img src="beachball.png" alt="Beach Ball" class="beach-ball">
+    <img src="handsaw.png" alt="Hand Saw" class="handsaw">
+    <img src="nailpuller.png" alt="Nail Puller" class="nail-puller">
+    <img src="iceauger.png" alt="Ice Auger" class="ice-auger">
+    <img src="watergun.png" alt="Water Gun" class="water-gun">
+    <img src="swedbankcard.png" alt="Swedbank Card" class="swedbank-card">
+
+    <!-- Add the button for playing the songs -->
+    <div style="position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;">
+        <button id="play-button" style="margin-bottom: 10px;">
+            techno remix
+        </button>
+        <button id="tropical-button">
+            tropical remix
+        </button>
+    </div>
+
+    <!-- Add the audio elements with the correct sources -->
+    <audio id="audio" src="technoremix.mp4" preload="auto"></audio>
+    <audio id="bubble-audio" src="bubble.mp4" preload="auto"></audio>
+    <audio id="saw-audio" src="saw.mp4" preload="auto"></audio>
+    <audio id="hammer-audio" src="hammer.mp4" preload="auto"></audio>
+    <audio id="icedrill-audio" src="icedrill1.mp4" preload="auto"></audio>
+    <audio id="kaching-audio" src="kaching.mp4" preload="auto"></audio>
+    <audio id="watergun-audio" src="watergun.mp4" preload="auto"></audio>
+    <audio id="tang-audio" src="tang.mp4" preload="auto"></audio>
+
+    <!-- Add SVG for the swirling text -->
+    <svg width="100%" height="100%">
+        <defs>
+            <linearGradient id="text-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color: #add8e6; stop-opacity: 1" /> <!-- Light Blue -->
+                <stop offset="50%" style="stop-color: #ff0000; stop-opacity: 1" /> <!-- Red -->
+                <stop offset="100%" style="stop-color: #ffff00; stop-opacity: 1" /> <!-- Yellow -->
+            </linearGradient>
+            <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color: #ff0000; stop-opacity: 1" />
+                <stop offset="16.67%" style="stop-color: #ff7f00; stop-opacity: 1" />
+                <stop offset="33.33%" style="stop-color: #ffff00; stop-opacity: 1" />
+                <stop offset="50%" style="stop-color: #00ff00; stop-opacity: 1" />
+                <stop offset="66.67%" style="stop-color: #00ffff; stop-opacity: 1" />
+                <stop offset="83.33%" style="stop-color: #0000ff; stop-opacity: 1" />
+                <stop offset="100%" style="stop-color: #8b00ff; stop-opacity: 1" />
+            </linearGradient>
+        </defs>
+        <path id="swirl-path" d="M 50,50 Q 100,0 150,50 T 250,50 T 350,50 T 450,50" fill="transparent" />
+        <text class="rainbow-text" fill="url(#text-gradient)">
+            <textPath href="#swirl-path" startOffset="0%">
+                pappa peders verktygslåda (remix edition)
+            </textPath>
+        </text>
+    </svg>
+
+    <script>
+        // Get all images
+        const images = document.querySelectorAll('img');
+        const rainbowText = document.querySelector('.rainbow-text');
+        let rotatingCount = 0;
+        const totalImages = images.length;
+        let confettiInterval;
+
+        function createConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.opacity = '1';
+    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+    document.body.appendChild(confetti);
+
+    const animation = confetti.animate([
+        { transform: `translate(0, -10px) rotate(0deg)`, opacity: 1 },
+        { transform: `translate(${Math.random() * 200 - 100}px, ${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+    ], {
+        duration: 1000 + Math.random() * 500, // Snabbare konfettiregn
+        easing: 'cubic-bezier(.37,0,.63,1)'
+    });
+
+    animation.onfinish = () => confetti.remove();
+}
+        function updateBackground() {
+            const opacity = rotatingCount / totalImages;
+            document.body.style.setProperty('--gradient-opacity', opacity);
+            
+            if (rotatingCount > 0) {
+                document.body.classList.add('rainbow-active');
+            } else {
+                document.body.classList.remove('rainbow-active');
+            }
+
+            // Handle all objects rotating state
+            if (rotatingCount === totalImages) {
+                // Add pulsing effect to all rotating objects
+                images.forEach(img => img.classList.add('pulsing'));
+                // Start confetti
+                if (!confettiInterval) {
+                    confettiInterval = setInterval(createConfetti, 50);
+                }
+            } else {
+                // Remove pulsing effect and stop confetti
+                images.forEach(img => img.classList.remove('pulsing'));
+                if (confettiInterval) {
+                    clearInterval(confettiInterval);
+                    confettiInterval = null;
+                }
+            }
+        }
+
+        // Add click event listener to each image
+        images.forEach(img => {
+            img.addEventListener('click', function() {
+                if (this.classList.contains('rotating')) {
+                    // Stop rotation
+                    this.classList.remove('rotating');
+                    rotatingCount--;
+                    // Remove moving gradient class if no images are rotating
+                    if (rotatingCount === 0) {
+                        rainbowText.classList.remove('moving-gradient');
+                    }
+                } else {
+                    // Start rotation
+                    this.classList.add('rotating');
+                    rotatingCount++;
+                    // Add moving gradient class when at least one image is rotating
+                    rainbowText.classList.add('moving-gradient');
+                }
+                
+                // Update background based on rotating count
+                updateBackground();
+            });
+        });
+
+        // Add event listener for the techno button
+        const playButton = document.getElementById('play-button');
+        const audio = document.getElementById('audio');
+
+        playButton.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play(); // Play the audio when the button is clicked
+                playButton.textContent = "stop"; // Change button text to "stop" in lowercase
+            } else {
+                audio.pause(); // Pause the audio when clicked again
+                playButton.textContent = "techno remix"; // Change button text back to original in lowercase
+            }
+        });
+
+        // Add event listener for the tropical button
+        const tropicalButton = document.getElementById('tropical-button');
+        const tropicalAudio = new Audio('tropical.mp4'); // Create a new audio object for tropical remix
+
+        tropicalButton.addEventListener('click', function() {
+            if (tropicalAudio.paused) {
+                tropicalAudio.play(); // Play the tropical audio when the button is clicked
+                tropicalButton.textContent = "stop"; // Change button text to "stop" in lowercase
+            } else {
+                tropicalAudio.pause(); // Pause the tropical audio when clicked again
+                tropicalButton.textContent = "tropical remix"; // Change button text back to original in lowercase
+            }
+        });
+
+        // Get the beach ball image
+        const beachBall = document.querySelector('.beach-ball');
+        const bubbleAudio = document.getElementById('bubble-audio'); // Get the bubble audio element
+
+        beachBall.addEventListener('click', function() {
+            if (bubbleAudio.paused) {
+                bubbleAudio.loop = true; // Set the audio to loop
+                bubbleAudio.play(); // Play the bubble audio when the beach ball is clicked
+            } else {
+                bubbleAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+
+        // Get the hand saw image
+        const handSaw = document.querySelector('.handsaw');
+        const sawAudio = document.getElementById('saw-audio'); // Get the saw audio element
+
+        handSaw.addEventListener('click', function() {
+            if (sawAudio.paused) {
+                sawAudio.loop = true; // Set the audio to loop
+                sawAudio.play(); // Play the saw audio when the hand saw is clicked
+            } else {
+                sawAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+
+        // Get the hammer image
+        const hammer = document.querySelector('.centered-image');
+        const hammerAudio = document.getElementById('hammer-audio'); // Get the hammer audio element
+
+        hammer.addEventListener('click', function() {
+            if (hammerAudio.paused) {
+                hammerAudio.loop = true; // Set the audio to loop
+                hammerAudio.play(); // Play the hammer audio when the hammer is clicked
+            } else {
+                hammerAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+
+        // Get the ice auger image
+        const iceAuger = document.querySelector('.ice-auger');
+        const icedrillAudio = document.getElementById('icedrill-audio'); // Get the ice drill audio element
+
+        iceAuger.addEventListener('click', function() {
+            if (icedrillAudio.paused) {
+                icedrillAudio.loop = true; // Set the audio to loop
+                icedrillAudio.play(); // Play the ice drill audio when the ice auger is clicked
+            } else {
+                icedrillAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+
+        // Get the swedbank card image
+        const swedbankCard = document.querySelector('.swedbank-card');
+        const kachingAudio = document.getElementById('kaching-audio'); // Get the kaching audio element
+
+        swedbankCard.addEventListener('click', function() {
+            if (kachingAudio.paused) {
+                kachingAudio.loop = true; // Set the audio to loop
+                kachingAudio.play(); // Play the kaching audio when the swedbank card is clicked
+            } else {
+                kachingAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+
+        // Get the water gun image
+        const waterGun = document.querySelector('.water-gun');
+        const watergunAudio = document.getElementById('watergun-audio'); // Get the water gun audio element
+
+        waterGun.addEventListener('click', function() {
+            if (watergunAudio.paused) {
+                watergunAudio.loop = true; // Set the audio to loop
+                watergunAudio.play(); // Play the water gun audio when the water gun is clicked
+            } else {
+                watergunAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+
+        // Get the pliers image
+        const pliers = document.querySelector('.nail-puller');
+        const tangAudio = document.getElementById('tang-audio'); // Get the tang audio element
+
+        pliers.addEventListener('click', function() {
+            if (tangAudio.paused) {
+                tangAudio.loop = true; // Set the audio to loop
+                tangAudio.play(); // Play the tang audio when the pliers are clicked
+            } else {
+                tangAudio.pause(); // Pause the audio when clicked again
+            }
+        });
+    </script>
+</body>
+</html>
